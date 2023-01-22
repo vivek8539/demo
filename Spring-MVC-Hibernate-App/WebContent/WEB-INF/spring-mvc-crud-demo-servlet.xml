@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xsi:schemaLocation=" http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
+
+
+<!-- Add support for component scanning -->
+<context:component-scan base-package="com.vivek.spring" />
+<!-- Add support for conversion, formatting and validation support -->
+<mvc:annotation-driven/>
+<!-- Define Spring MVC view resolver -->
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+<property name="prefix" value="/WEB-INF/view/" />
+<property name="suffix" value=".jsp" />
+</bean>
+
+<!-- Step 1: Define Database DataSource / connection pool -->
+
+
+
+<bean class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close" id="dataSource">
+
+ <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+
+<property value="jdbc:mysql://localhost:3306/web_customer_tracker?useSSL=false" name="url"/>
+
+<property value="springstudent" name="username"/>
+
+<property value="springstudent" name="password"/>
+
+<!-- these are connection pool properties for C3P0 -->
+
+
+<property value="5" name="initialSize"/>
+
+<property value="20" name="maxTotal"/>
+
+
+
+</bean>
+    
+    
+<!-- Add session factory bean -->
+ <bean class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" id="sessionFactory">
+
+<property name="dataSource" ref="dataSource"/>
+
+<property value="com.vivek.spring.hibernate.entity" name="packagesToScan"/>
+
+
+<property name="hibernateProperties">
+
+
+<props>
+
+<prop key="hibernate.dialect">org.hibernate.dialect.MariaDB106Dialect</prop>
+   <prop key="hibernate.hbm2ddl.auto">update</prop>  
+                
+<prop key="hibernate.show_sql">true</prop>
+
+</props>
+
+</property>
+
+</bean>
+<!-- Add beans for transaction manager -->
+    <bean id="transactionManager" 
+      class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+<!-- enable configuration of transactional annotation -->
+<tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+
+<mvc:resources location="/resources/" mapping="/resources/**"></mvc:resources>
+
+
+
+   
+
+</beans>
+
+
